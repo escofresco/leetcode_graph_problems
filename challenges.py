@@ -1,3 +1,5 @@
+from collections import deque
+
 def numIslands(grid):
     """Take in a grid of 1s (land) and 0s (water) and return the number of islands."""
     def bfs(row, col):
@@ -27,7 +29,30 @@ def timeToRot(grid):
     orange. Each minute, a rotten orange contaminates its 4-directional neighbors. Return the number
     of minutes until all oranges rot.
     """
-    pass
+    queue = deque()
+    total_seconds = 0
+
+    for row in range(len(grid)):
+        for col in range(len(grid[0])):
+            if grid[row][col] == 2:
+                grid[row][col] = 1
+                queue.append((row, col, 0))
+
+    while len(queue):
+        cur_row, cur_col, seconds = queue.popleft()
+
+        if (cur_row >= 0 and cur_row < len(grid) and
+            cur_col >= 0 and cur_col < len(grid[0]) and
+            grid[cur_row][cur_col] == 1):
+            queue.extend(((cur_row, cur_col+1, seconds+1), (cur_row, cur_col-1, seconds+1),
+                          (cur_row+1, cur_col, seconds+1), (cur_row-1, cur_col, seconds+1)))
+            grid[cur_row][cur_col] = 0
+            total_seconds = max(total_seconds, seconds)
+
+    for row in grid:
+        if any(row):
+            return -1
+    return total_seconds
 
 def courseOrder(numCourses, prerequisites):
     """Return a course schedule according to the prerequisites provided."""
