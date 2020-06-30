@@ -56,7 +56,35 @@ def timeToRot(grid):
 
 def courseOrder(numCourses, prerequisites):
     """Return a course schedule according to the prerequisites provided."""
-    pass
+    adj_list = [[] for _ in range(numCourses)]
+    course_to_indegree = [0] * numCourses
+
+    seen = [False] * numCourses
+    sorted_courses = []
+
+    for course, prereq in prerequisites:
+        adj_list[prereq].append(course)
+
+    for courses in adj_list:
+        for course in courses:
+            course_to_indegree[course] += 1
+    indegree0_courses = [prereq for prereq,indegree in enumerate(course_to_indegree) if indegree == 0]
+
+    while len(indegree0_courses):
+        prereq = indegree0_courses.pop()
+
+        if not seen[prereq]:
+            sorted_courses.append(prereq)
+
+            for course in adj_list[prereq]:
+                course_to_indegree[course] -= 1
+
+                if course_to_indegree[course] == 0:
+                    indegree0_courses.append(course)
+            seen[prereq] = True
+    if any(course_to_indegree):
+        return []
+    return sorted_courses
 
 def wordLadderLength(beginWord, endWord, wordList):
     """Return the length of the shortest word chain from beginWord to endWord, using words from wordList."""
@@ -71,7 +99,7 @@ if __name__ == '__main__':
         [1, 1, 0, 0, 0],
         [0, 0, 0, 0, 0]
     ]
-    assert numIslands(map1) == 1
+    assert numIslands(list(map(lambda row: list(map(str, row)), map1))) == 1
 
     map2 = [
         [1, 1, 0, 0, 0],
@@ -79,7 +107,7 @@ if __name__ == '__main__':
         [0, 0, 1, 0, 0],
         [0, 0, 0, 1, 1]
     ]
-    assert numIslands(map2) == 3
+    assert numIslands(list(map(lambda row: list(map(str, row)), map2))) == 3
 
     # timeToRot Test Cases
     oranges1 = [
